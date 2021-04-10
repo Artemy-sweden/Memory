@@ -72,5 +72,6 @@
   background: rgb(27, 80, 255);
 }
 .secret__side {
+  background: rgb(255, 145, 0);
   display: none;
 }

@@ -56,22 +56,94 @@ for (let i = 0; i < diff * diff; i++) {
   }
   cardsArray[i] = coupleArray[rand - 1];
   indexArray.splice(randIndex, 1);
-  console.log(cardsArray[i]);
 }
 
 /******************************cards generation***************************** */
 
+var idCommonArray = [];
+var idSecretArray = [];
+
 for (let i = 0; i < diff * diff; i++) {
-  generateCards(cardsArray[i]);
+  idCommonArray[i] = i + 1;
+}
+idSecretArray[0] = idCommonArray[diff * diff - 1] + 1;
+for (let i = 1; i < diff * diff; i++) {
+  idSecretArray[i] = idSecretArray[i - 1] + 1;
 }
 
-function generateCards(cardNumber) {
+for (let i = 0; i < diff * diff; i++) {
+  generateCards(cardsArray[i], idCommonArray[i], idSecretArray[i]);
+}
+
+function generateCards(cardNumber, idFirstValue, idSecondValue) {
   game = document.getElementById("gameField");
   game.insertAdjacentHTML(
     "beforeend",
     `<div class="card">
-  <div class="common__side"><script>cardNumber</script></div>
-  <div class="secret__side"></div>
-</div>`
+  <div class="common__side" " onclick="compareCards(` +
+      idFirstValue +
+      `)" id="` +
+      idFirstValue +
+      `"></div>
+  <div class="secret__side" id="` +
+      idSecondValue +
+      `">` +
+      cardNumber +
+      `</div>`
   );
+}
+
+/**                    opening and comparing cards            */
+var cardsCorrectOpened = 0;
+var firstCardOpened = false;
+var secondCardOpened = false;
+var firstCardValue;
+var secondCardValue;
+var firstCardId;
+var secondCardId;
+
+function openCard(commonSide) {
+  let secretSideOpen = commonSide + diff * diff;
+  document.getElementById(commonSide).style.display = "none";
+  document.getElementById(secretSideOpen).style.display = "flex";
+}
+
+function compareCards(cardValue) {
+  let secretSideCardValue = cardValue + diff * diff;
+  if (firstCardOpened == true) {
+    secondCardOpened = true;
+    secondCardId = cardValue;
+    openCard(cardValue);
+    secondCardValue = document.getElementById(secretSideCardValue).textContent;
+
+    if (firstCardValue == secondCardValue) {
+      firstCardOpened = false;
+      secondCardOpened = false;
+      cardsCorrectOpened++;
+      if (cardsCorrectOpened == (diff * diff) / 2) {
+        alert("Congratulations!!! You perfectly finish the game!!!");
+        setTimeout((window.location.href = "index.html"), 3000);
+      }
+    } else {
+      firstCardOpened = false;
+      secondCardOpened = false;
+      setTimeout(closeCards, 300);
+    }
+  } else {
+    firstCardOpened = true;
+    firstCardValue = document.getElementById(secretSideCardValue).textContent;
+    firstCardId = cardValue;
+    openCard(cardValue);
+  }
+}
+
+function closeCards() {
+  let secretCardCloseFirst = firstCardId + diff * diff;
+  let secretCardCloseSecond = secondCardId + diff * diff;
+  document.getElementById(firstCardId).style.display = "flex";
+  document.getElementById(secretCardCloseFirst).style.display = "none";
+  document.getElementById(secondCardId).style.display = "flex";
+  document.getElementById(secretCardCloseSecond).style.display = "none";
+  firstCardId = null;
+  secondCardId = null;
 }
